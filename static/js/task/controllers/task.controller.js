@@ -6,14 +6,17 @@
         .controller('TaskController', TaskController);
 
     TaskController.$inject = ['$scope', '$state', '$mdToast', '$log', '$http', '$stateParams',
-        'Task', 'Authentication', 'Template', '$sce', '$filter', '$rootScope', 'RatingService', '$cookies'];
+        'Task', 'Authentication', 'Template', '$sce', '$filter', '$rootScope', 'RatingService', '$cookies', '$timeout'];
 
-    function TaskController($scope, $state, $mdToast, $log, $http, $stateParams, Task, Authentication, Template, $sce, $filter, $rootScope, RatingService, $cookies) {
+    function TaskController($scope, $state, $mdToast, $log, $http, $stateParams, Task, Authentication, Template, $sce, $filter, $rootScope, RatingService, $cookies, $timeout) {
         var self = this;
         self.taskData = null;
         self.skip = skip;
         self.submitOrSave = submitOrSave;
         self.saveComment = saveComment;
+        self.pauseandplay = pauseandplay ;
+        self.buttonType = 'pause';
+        self.stopped = false;
         activate();
         function activate() {
 
@@ -42,6 +45,7 @@
                     self.taskData = data[0].data;
                     self.time_left = data[0].time_left;
                     self.taskData.id = self.taskData.task ? self.taskData.task : id;
+                    countdown(0,0);
                     if (self.taskData.has_comments) {
                         Task.getTaskComments(self.taskData.id).then(
                             function success(data) {
@@ -60,6 +64,40 @@
                 });
         }
 
+        function countdown(minutes, seconds) {
+                    $scope.counter = 0;
+                    self.timer = format($scope.counter);
+                    $scope.onTimeout = function(){
+                        $scope.counter++;
+                        self.timer = format($scope.counter);
+                        self.mytimeout = $timeout($scope.onTimeout,1000);
+                    }
+                    self.mytimeout = $timeout($scope.onTimeout,1000)
+
+                    function format(input)
+                    {
+                        function z(n) {return (n<10? '0' : '') + n;}
+                        var seconds = input % 60;
+                        var minutes = Math.floor(input / 60);
+                        var hours = Math.floor(minutes / 60);
+                        return (z(hours) +':'+z(minutes)+':'+z(seconds));
+                    };
+
+                }
+
+        function pauseandplay() {
+            if(!self.stopped){
+                $timeout.cancel(self.mytimeout);
+                self.buttonType='play_arrow';
+            }
+            else
+            {
+                self.mytimeout = $timeout($scope.onTimeout,1000);
+                self.buttonType='pause';
+            }
+                self.stopped=!self.stopped;
+        }  
+        
 
         function skip() {
             if (self.isSavedQueue || self.isSavedReturnedQueue) {
