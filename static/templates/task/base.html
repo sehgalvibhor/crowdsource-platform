@@ -10,15 +10,6 @@
                     <div md-template-compiler="item" editor="false" instance="template"></div>
                 </div>
                 <div layout="row" class="task-actions" layout-align="end center">
-                    <md-button ng-click="toggle = !toggle" class="md-icon-button">
-                    <md-tooltip>Show/Hide timer</md-tooltip>
-                    <md-icon md-font-set="material-icons"> schedule
-                    </md-icon>
-                    </md-button>
-                    <text ng-show="!toggle">{{ task.timer }}</text>
-                    <md-button ng-show="!toggle" ng-click="task.pauseandplay()" class="md-icon-button">
-                        <md-icon md-font-set="material-icons"> {{ task.buttonType }} </md-icon> 
-                    </md-button>
                     <md-button ng-click="task.submitOrSave(2)"
                                tabindex="0">Submit
                     </md-button>
@@ -28,7 +19,27 @@
                     <md-button ng-click="task.skip()"
                                tabindex="0">Skip
                     </md-button>
-                </div>
+                    <md-button ng-click="toggle = !toggle" class="md-icon-button">
+                        <md-tooltip>Show/Hide timer</md-tooltip>
+                        <md-icon md-font-set="material-icons"> schedule
+                        </md-icon>
+                    </md-button>
+                    <div>
+                        <md-card ng-if="task.timerInstruction" class="timer-instruction">
+                            <md-card-content>
+                                <div class="instruction-title">Help us calculate your hourly wage.</div>
+                                <div class="instruction-body">The timer will tell you how long it takes you to finish this task.</div>
+                            </md-card-content>
+                            <md-card-actions layout="row" layout-align="end center">
+                              <md-button ng-click="task.timerInstruction=false">Got it</md-button>
+                            </md-card-actions>
+                        </md-card>                        
+                        <text  class="taskfeed-timer" ng-show="!toggle"  ng-click="task.timerInstruction=true">{{ task.timer }}</text>
+                    </div>
+                    <md-button ng-show="!toggle" ng-click="task.pauseandplay()" class="md-icon-button">
+                        <md-icon md-font-set="material-icons"> {{ task.buttonType }} </md-icon> 
+                    </md-button>
+            </div>
             </form>
 
         </div>

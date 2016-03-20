@@ -459,3 +459,22 @@ img.circular {
   border-radius: 50%;
 }
 
+.timer-instruction{
+  position:absolute;
+  width:200px;
+  text-align:justify;
+  bottom:80px;
+  right:30px;
+  background-color:rgba(100,100,100,0.1);
+  .instruction-title{
+    font-weight:bold;
+    font-size:14px;
+  }
+  .instruction-body{
+    font-size:13px;
+    margin-top:10px;
+  }
+}
+.taskfeed-timer{
+  cursor:help;
+}

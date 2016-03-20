@@ -10,6 +10,7 @@
 
     function TaskController($scope, $state, $mdToast, $log, $http, $stateParams, Task, Authentication, Template, $sce, $filter, $rootScope, RatingService, $cookies, $timeout) {
         var self = this;
+        self.timerInstruction = true;
         self.taskData = null;
         self.skip = skip;
         self.submitOrSave = submitOrSave;
