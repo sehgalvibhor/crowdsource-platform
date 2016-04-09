@@ -240,7 +240,8 @@ class Project(models.Model):
     status = models.IntegerField(choices=STATUS, default=STATUS_SAVED)
     price = models.FloatField(null=True, blank=True)
     repetition = models.IntegerField(default=1)
-    timeout = models.IntegerField(default=180)
+    timeout = models.IntegerField(null=True, blank=True)
+    deadline = models.DateTimeField(null=True)
     has_data_set = models.BooleanField(default=False)
     data_set_location = models.CharField(max_length=256, null=True, blank=True)
     task_time = models.FloatField(null=True, blank=True)  # in minutes
@@ -260,6 +261,7 @@ class Project(models.Model):
     )
     feedback_permissions = models.IntegerField(choices=PERMISSION, default=PERMISSION_ORW_WRW)
     batch_files = models.ManyToManyField(BatchFile, through='ProjectBatchFile')
+    post_mturk = models.BooleanField(default=False)
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
@@ -439,10 +441,11 @@ class Currency(models.Model):
 
 class UserPreferences(models.Model):
     user = models.OneToOneField(User)
-    language = models.ForeignKey(Language)
-    currency = models.ForeignKey(Currency)
+    language = models.ForeignKey(Language, null=True, blank=True)
+    currency = models.ForeignKey(Currency, null=True, blank=True)
     login_alerts = models.SmallIntegerField(default=0)
     last_updated = models.DateTimeField(auto_now_add=False, auto_now=True)
+    auto_accept = models.BooleanField(default=False)
 
 
 class FlowModel(models.Model):
@@ -494,7 +497,7 @@ class Message(models.Model):
         (STATUS_DELIVERED, 'Delivered'),
         (STATUS_READ, 'Read')
     )
-    conversation = models.ForeignKey(Conversation, related_name='messages')
+    conversation = models.ForeignKey(Conversation, related_name='messages', on_delete=models.CASCADE)
     sender = models.ForeignKey(User)
     body = models.TextField(max_length=8192)
     deleted = models.BooleanField(default=False)
@@ -504,13 +507,26 @@ class Message(models.Model):
 
 
 class ConversationRecipient(models.Model):
+    STATUS_OPEN = 1
+    STATUS_MINIMIZED = 2
+    STATUS_CLOSED = 3
+    STATUS_MUTED = 4
+
+    STATUS = (
+        (STATUS_OPEN, "Open"),
+        (STATUS_MINIMIZED, 'Minimized'),
+        (STATUS_CLOSED, 'Closed'),
+        (STATUS_MUTED, 'Muted')
+    )
     recipient = models.ForeignKey(User, related_name='recipients')
-    conversation = models.ForeignKey(Conversation, related_name='conversation_recipient')
+    conversation = models.ForeignKey(Conversation, related_name='conversations', on_delete=models.CASCADE)
+    status = models.SmallIntegerField(choices=STATUS, default=STATUS_OPEN)
     date_added = models.DateTimeField(auto_now_add=True, auto_now=False)
+    deleted = models.BooleanField(default=False)
 
 
 class UserMessage(models.Model):
-    message = models.ForeignKey(Message)
+    message = models.ForeignKey(Message, on_delete=models.CASCADE)
     user = models.ForeignKey(User)
     deleted = models.BooleanField(default=False)
 
